@@ -7,7 +7,14 @@ Frances Davies & Yuefeng Li
 import random
 import itertools
 
+# To be replenished
+POSITIVE_WORDS = ["nice", "reliable", "trustworthy"]
+NEGATIVE_WORDS = ["lying", "mean", "reckless"]
+
 class Player:
+    # A map of comments made by other players about current player.
+    ALL_COMMENTS = {} # "name --> comment"
+    COMMENTS_ABOUT_ME = {} # "name --> comment"
     
     def init_remark(s):
         if s.niceness > 0.5 and s.likability > 0.5:
@@ -25,6 +32,30 @@ class Player:
         s.likability = likability # 0-1
         s.suspicion = suspicion # 0-1
         s.next_remark = s.init_remark()
+
+    def make_accusation(candidates):
+        # 1. Takes as candidates for accusation a list of players
+        #    consisting of the top three players ranked in suspicion,
+        #    as well as players who have made negative comments about
+        #    current players
+        # 2. Randomly chooses one player to accuse
+        # 3. Return the name (or instance) of the player being accused
+
+    def remember_conversations(players):
+        # 1. Loop over the rest of the players
+        # 2. Add everyone's comments to ALL_COMMENTS
+        # 3. Access their comments and see if it's about the current player
+        #    If it is, remember those comments in COMMENTS_ABOUT_ME
+
+    def make_comment():
+        # Randomly chooses between making comments about other players
+        # vs. comments that are not player-specific
+        
+    def respond():
+        # If there are comments about current player, respond to one of those comments
+        # chosen at random. Otherwise randomly respond to a comment. 
+        # Most of the pattern-matching happens here.
+
 
 #<METADATA>
 QUIET_VERSION = "0.1"
@@ -91,6 +122,8 @@ def move(s, werewolf, quality, change):
 
     print("Would you like to make a change?")
     edit_input = input() # W5 niceness .4, V8 name Steve
+
+    # Loop over
     
     updated_state = generate_conversation(s)
     return news
