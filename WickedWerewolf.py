@@ -8,8 +8,17 @@ import random
 import itertools
 
 # To be replenished
-POSITIVE_WORDS = ["nice", "reliable", "trustworthy"]
-NEGATIVE_WORDS = ["lying", "mean", "reckless"]
+POSITIVE_ADJ = ["nice", "reliable", "trustworthy", "not"]
+NEGATIVE_ADJ = ["dishonest", "mean", "reckless"]
+NEGATATIVE_VERBS = ["lying", "bluffing", "not telling the truth"]
+POSITIVE_VERBS = ["telling the truth", "speaking from his/her heart"]
+
+
+OPENING_SUPER_NICE = ["I hope everyone is going to have a good time!", "Werewolves is a fun game! Forget all your unhappiness!"]
+OPENING_NICE["Let's play!", "Look! It's a psychological game! Yay!", "I'll drink and play"]
+OPENING_NONCHALANT["It's a game. Okay. I get it.", "Let's get this over with so I can go home and watch FamilyGuys.", "I play to win!"]
+GREETINGS = ['greetings', 'hello', 'hey','hi','what\'s up', 'wassup', 'bonjour', 'yo', 'good day']
+
 
 class Player:
     # A map of comments made by other players about current player.
@@ -18,11 +27,14 @@ class Player:
     
     def init_remark(s):
         if s.niceness > 0.5 and s.likability > 0.5:
-            return "I love games!"
+            return GREETINGS[random.randrange(0, GREETINGS)].capitalize() + "! "
+                    + OPENING_SUPER_NICE[random.randrange(0, OPENING_SUPER_NICE.len())]
         if s.niceness > 0.5 or s.likability > 0.5:
-            return "Let's play!"
+            return GREETINGS[random.randrange(0, GREETINGS)].capitalize() + "! "
+                    + OPENING_NICE[random.randrange(0, OPENING_NICE.len())]
         else:
-            return "I play to win."
+            return GREETINGS[random.randrange(0, GREETINGS)].capitalize() + "! "
+                    + OPENING_NONCHALANT[random.randrange(0, OPENING_NONCHALANT.len())]
         
     def __init__(s, name, kind, niceness, likability, suspicion):
         # constants
@@ -33,24 +45,37 @@ class Player:
         s.suspicion = suspicion # 0-1
         s.next_remark = s.init_remark()
 
-    def make_accusation(candidates):
-        # 1. Takes as candidates for accusation a list of players
-        #    consisting of the top three players ranked in suspicion,
-        #    as well as players who have made negative comments about
-        #    current players
-        # 2. Randomly chooses one player to accuse
-        # 3. Return the name (or instance) of the player being accused
-
     def remember_conversations(players):
         # 1. Loop over the rest of the players
         # 2. Add everyone's comments to ALL_COMMENTS
         # 3. Access their comments and see if it's about the current player
         #    If it is, remember those comments in COMMENTS_ABOUT_ME
 
-    def make_comment():
+    def make_comment(s):
         # Randomly chooses between making comments about other players
         # vs. comments that are not player-specific
+
+        # 0 is generic comments and 1 is player.specific
+        specific_or_not = random.randrange(0, 2)
+
+        # First, randomly chooses a quality to choose the top 3 players from.
         
+        # Second, chooses a random player out of the 3 top players based on a random quality generated
+        # in first step.
+        
+        # Third, make comment about that player.
+        # If niceness is chosen and niceness is > 0.5, then make positive comments about that player, negative otherwise.
+        # If likability is chosen and is > 0.5, make positive comments. Negative otherwise.
+        # If suspicion is chosen and is > 0.5, negative comments are made. Positive otherwise.
+
+        # Comments are in the following format: I think he/she is + verb or adj, positive/negative based on quality.
+
+        int_to_quality = {0 : "niceness", 1 : "likability", 2 : "suspicion"}   # For randomly choose a quality.
+        quality = int_to_quality[random.randrange(0, 3)]    # Randomly chooses a quality to get the top 3 players with that quality.
+        
+        if specific_or_not == 1:
+            names = get_top_3(s, "suspicion")
+            return "I " + random.randrange()
     def respond():
         # If there are comments about current player, respond to one of those comments
         # chosen at random. Otherwise randomly respond to a comment. 
@@ -123,7 +148,12 @@ def move(s, werewolf, quality, change):
     print("Would you like to make a change?")
     edit_input = input() # W5 niceness .4, V8 name Steve
 
-    # Loop over
+    # Loop over all players and:
+    # 1. Make opening comments
+    # 2. First player to make accusation
+    # 3. Rest of players to make comments
+    # 4. Players mentioned have an opportunity to respond to comments about them.
+                                           
     
     updated_state = generate_conversation(s)
     return news
@@ -135,6 +165,21 @@ def get_kind(s, kind):
         if p.kind == kind:
             just_kind.append(p)
     return just_kind
+
+def get_player_character(s):
+    players = s['players']
+    character = {}
+    for p in players:
+        character[p.name] = [p.niceness, p.likability, p.suspicion]
+    return character
+                                           
+def get_top_3(s, kind):
+    'Returns the top three players ranked in the given quality.'
+    quality_to_int = {"niceness": 0, "likability": 1, "suspicion": 2}
+    character = get_player-character(s)
+    candidates = sorted(players.name, key = lambda k: d[k][quality_to_int[kind]])    # Sort names according to suspicion, descending (hence the negative).
+    candidates = candidates[0:3]
+    return candidates[random.randrange(0, candidates.len())]
 
 def q(s):
     # smaller numbers are better
