@@ -6,52 +6,85 @@ Frances Davies & Yuefeng Li
 
 import random
 import itertools
+import copy
+
+ALL_COMMENTS = {} # "name --> comment"
 
 # To be replenished
 POSITIVE_ADJ = ["nice", "reliable", "trustworthy", "not"]
 NEGATIVE_ADJ = ["dishonest", "mean", "reckless"]
-NEGATATIVE_VERBS = ["lying", "bluffing", "not telling the truth"]
-POSITIVE_VERBS = ["telling the truth", "speaking from his/her heart"]
+NEGATATIVE_VERBS = ["lying", "bluffing", "not-telling-the-truth"]
+POSITIVE_VERBS = ["telling-the-truth", "speaking-from-his/her-heart"]
+
+GENERIC_VERBS = ['go', 'be', 'try', 'eat', 'take', 'help',
+         'make', 'get', 'jump', 'write', 'type', 'fill',
+         'put', 'turn', 'compute', 'think', 'drink',
+         'blink', 'crash', 'crunch', 'add', 'dance', 'kill',
+         'read', 'hear', 'heard', 'tell', 'talk']
+
+NOUNS = ['food', 'grass', 'marbles', 'my-professor']
 
 
 OPENING_SUPER_NICE = ["I hope everyone is going to have a good time!", "Werewolves is a fun game! Forget all your unhappiness!"]
-OPENING_NICE["Let's play!", "Look! It's a psychological game! Yay!", "I'll drink and play"]
-OPENING_NONCHALANT["It's a game. Okay. I get it.", "Let's get this over with so I can go home and watch FamilyGuys.", "I play to win!"]
+OPENING_NICE = ["Let's play!", "Look! It's a psychological game! Yay!", "I'll drink and play"]
+OPENING_NONCHALANT = ["It's a game. Okay. I get it.", "Let's get this over with so I can go home and watch FamilyGuys.", "I play to win!"]
 GREETINGS = ['greetings', 'hello', 'hey','hi','what\'s up', 'wassup', 'bonjour', 'yo', 'good day']
-
 
 class Player:
     # A map of comments made by other players about current player.
-    ALL_COMMENTS = {} # "name --> comment"
-    COMMENTS_ABOUT_ME = {} # "name --> comment"
-    
-    def init_remark(s):
-        if s.niceness > 0.5 and s.likability > 0.5:
-            return GREETINGS[random.randrange(0, GREETINGS)].capitalize() + "! "
-                    + OPENING_SUPER_NICE[random.randrange(0, OPENING_SUPER_NICE.len())]
-        if s.niceness > 0.5 or s.likability > 0.5:
-            return GREETINGS[random.randrange(0, GREETINGS)].capitalize() + "! "
-                    + OPENING_NICE[random.randrange(0, OPENING_NICE.len())]
-        else:
-            return GREETINGS[random.randrange(0, GREETINGS)].capitalize() + "! "
-                    + OPENING_NONCHALANT[random.randrange(0, OPENING_NONCHALANT.len())]
         
     def __init__(s, name, kind, niceness, likability, suspicion):
         # constants
+        s.COMMENTS_ABOUT_ME = {} # "name --> comment"
         s.name = name # p1, p2, p3...
-        s.kind = kind # werewolf, villager, seer...
+        s.kind = kind # werewolf, villager
         s.niceness = niceness # 0-1
         s.likability = likability # 0-1
         s.suspicion = suspicion # 0-1
-        s.next_remark = s.init_remark()
+        
+        global POSITIVE_ADJ
+        global NEGATIVE_ADJ
+        global NEGATATIVE_VERBS
+        global POSITIVE_VERBS
+        global GENERIC_VERBS
+        global NOUNS
+        global OPENING_SUPER_NICE
+        global OPENING_NICE
+        global OPENING_NONCHALANT
+        global GREETINGS
+        
+        if s.niceness > 0.5 and s.likability > 0.5:
+            print(GREETINGS[random.randrange(0, len(GREETINGS))].capitalize() + "! " + OPENING_SUPER_NICE[random.randrange(0, len(OPENING_SUPER_NICE))])
+        if s.niceness > 0.5 or s.likability > 0.5:
+            print(GREETINGS[random.randrange(0, len(GREETINGS))].capitalize() + "! " + OPENING_NICE[random.randrange(0, len(OPENING_NICE))])
+        else:
+            print(GREETINGS[random.randrange(0, len(GREETINGS))].capitalize() + "! " + OPENING_NONCHALANT[random.randrange(0, len(OPENING_NONCHALANT))])
+        
+    def make_accusation(self, s):
+        option = get_top_3(s, 'suspicion')
+        return option[0]
 
-    def remember_conversations(players):
-        # 1. Loop over the rest of the players
-        # 2. Add everyone's comments to ALL_COMMENTS
-        # 3. Access their comments and see if it's about the current player
-        #    If it is, remember those comments in COMMENTS_ABOUT_ME
+    def vote(self, s, accusation):
+        return random.randrange(0,1)
 
-    def make_comment(s):
+    def comment_is_about_me(self, comment):
+        "Add comments about current player to COMMENTS_ABOUT_ME."
+        words = comment.split(' ')
+        for word in words:
+            if word == self.name:
+                return True
+        return False
+
+    def remember_conversations(self):
+        
+        for name in ALL_COMMENTS.keys():
+            val = ALL_COMMENTS[name]
+            if self.comment_is_about_me(val):
+                self.COMMENTS_ABOUT_ME[name] = ALL_COMMENTS[name]
+
+    def make_comment(self, s):
+        comment = ''
+        
         # Randomly chooses between making comments about other players
         # vs. comments that are not player-specific
 
@@ -72,15 +105,46 @@ class Player:
 
         int_to_quality = {0 : "niceness", 1 : "likability", 2 : "suspicion"}   # For randomly choose a quality.
         quality = int_to_quality[random.randrange(0, 3)]    # Randomly chooses a quality to get the top 3 players with that quality.
+        comment = ""
         
         if specific_or_not == 1:
-            names = get_top_3(s, "suspicion")
-            return "I " + random.randrange()
-    def respond():
+            if quality == 0:    # If making comments based on niceness
+                pos_or_neg = random.randrange(0, 2)
+                verb = None
+                names = get_top_3(s, "niceness")
+                comment = "I think" + names[random.randrange(0, 3)] + " is " + POSITIVE_VERBS[random.randrange(0, len(POSITIVE_VERBS))] + "!"
+            if quality == 1:
+                names = get_top_3(s, "likability")
+                comment = "I think" + names[random.randrange(0, 3)] + " is " + POSITIVE_VERBS[random.randrange(0, len(POSITIVE_VERBS))] + "!"
+            if quality == 2:
+                names = get_top_3(s, "suspicion")
+                comment = "I think" + names[random.randrange(0, 3)] + " is " + NEGATIVE_VERBS[random.randrange(0, len(NEGATIVE_VERBS))] + "!"
+        else:
+            comment = "I " + GENERIC_VERBS[random.randrange(0, len(GENERIC_VERBS))] + " " + NOUNS[random.randrange(0, len(NOUNS))] + "."
+        ALL_COMMENTS[self.name] = comment
+        if comment != '':
+            print(comment)
+        
+    def respond(self):
+        if len(self.COMMENTS_ABOUT_ME) != 0:
+            names = self.COMMENTS_ABOUT_ME.keys()
+            name = names[random.randrange(0, len(names))]
+            comment = self.COMMENTS_ABOUT_ME[name]
+            words = comment.split(' ')
+            words = words[4]           
+            response = "Why do you think that I'm " + word + "?!"
+            print(response)
+            
+            
         # If there are comments about current player, respond to one of those comments
         # chosen at random. Otherwise randomly respond to a comment. 
         # Most of the pattern-matching happens here.
 
+    # need a make_accusation function??? (takes s, returns random player from 3 with highest suspicion)
+    # need a vote function??? (takes accusation, returns 0 or 1)
+    # need get_top_3???
+
+                
 
 #<METADATA>
 QUIET_VERSION = "0.1"
@@ -96,10 +160,14 @@ It is designed to work according to the QUIET tools interface.
 #</METADATA>
 
 #<COMMON_CODE>
-def DESCRIBE_STATE(state):
-      # Produces a textual description of a state.
-      # Might not be needed in normal operation with GUIs.
-      return str(state)
+def DESCRIBE_STATE(s):
+    # Produces a textual description of a state.
+    # Might not be needed in normal operation with GUIs.
+    result = "ROUND: " + str(s['round']) + " PLAYERS: "
+    players = s['players']
+    for p in players:
+        result = result + p.name + " "
+    return result
 
 def HASHCODE(s):
     return str(s)
@@ -107,16 +175,39 @@ def HASHCODE(s):
 def copy_state(s):
     return copy.deepcopy(s)
 
+def generate_conversation(s):
+    players = s['players']
+    random.shuffle(players)
+    p0 = players[0]
+    accusation = p0.make_accusation(s)
+    for p in players:
+        p.make_comment(s)
+    for p in players:
+        p.remember_conversations()
+    for p in players:
+        p.respond()
+    result = 0
+    for p in players:
+        result = result + p.vote(s, accusation)
+    if result > len(players)/2:
+        for p in players:
+            if p.name == accusation:
+                players.remove(p)
+                break
+    news = copy_state(s)
+    news['players'] = players
+    return news
+
 def can_move(s, werewolf, quality, change):
     players = s['players']
     for p in players:
-        if p.name == 'W' + werewolf:
+        if p.name == 'W' + str(werewolf):
             value = 0
-            if p.quality == 'niceness':
+            if quality == 'niceness':
                 value = p.niceness + change
-            if p.quality == 'likability':
+            if quality == 'likability':
                 value = p.likability + change
-            if p.quality == 'suspicion':
+            if quality == 'suspicion':
                 value = p.suspicion + change
             return value >= 0 and value <= 1
 
@@ -134,29 +225,44 @@ def move(s, werewolf, quality, change):
     if villager, players who voted 'kill' become more suspicious, if werewolf, players who voted to 'kill' become less suspicious
     return new state without dead player
     '''
+    ALL_COMMENTS.clear()
+    
     news = copy_state(s)
     players = news['players']
     for p in players:
-        if p.name == 'W' + werewolf:
-            if p.quality == 'niceness':
+        if p.name == 'W' + str(werewolf):
+            if quality == 'niceness':
                 p.niceness = p.niceness + change
-            if p.quality == 'likability':
+            if quality == 'likability':
                 p.likability = p.likability + change
-            if p.quality == 'suspicion':
+            if quality == 'suspicion':
                 p.suspicion = p.suspicion + change
 
-    print("Would you like to make a change?")
+    print("Would you like to make a change? Type 'name quality value' or 'no'.")
     edit_input = input() # W5 niceness .4, V8 name Steve
-
+    if edit_input != 'no':
+        values = edit_input.split()
+        name = values[0]
+        quality = values[1]
+        x = float(values[2])
+        for p in players:
+            if p.name == name:
+                if quality == 'niceness':
+                    p.niceness = x
+                if quality == 'likability':
+                    p.likability = x
+                if quality == 'suspicion':
+                    p.suspicion = x
+        
     # Loop over all players and:
     # 1. Make opening comments
     # 2. First player to make accusation
     # 3. Rest of players to make comments
     # 4. Players mentioned have an opportunity to respond to comments about them.
-                                           
     
     updated_state = generate_conversation(s)
-    return news
+    updated_state['round'] = updated_state['round'] + 1
+    return updated_state
 
 def get_kind(s, kind):
     players = s['players']
@@ -176,10 +282,10 @@ def get_player_character(s):
 def get_top_3(s, kind):
     'Returns the top three players ranked in the given quality.'
     quality_to_int = {"niceness": 0, "likability": 1, "suspicion": 2}
-    character = get_player-character(s)
-    candidates = sorted(players.name, key = lambda k: d[k][quality_to_int[kind]])    # Sort names according to suspicion, descending (hence the negative).
+    character = get_player_character(s)
+    candidates = sorted(character.keys(), key = lambda k: -character[k][quality_to_int[kind]])    # Sort names according to suspicion, descending (hence the negative).
     candidates = candidates[0:3]
-    return candidates[random.randrange(0, candidates.len())]
+    return candidates[random.randrange(0, len(candidates))]
 
 def q(s):
     # smaller numbers are better
@@ -192,7 +298,8 @@ def q(s):
     return (werewolf_len - len(get_kind(s, 'werewolf')))*average_werewolf_suspicion
 
 def goal_test(s):
-    return len(get_kind(s, 'werewolf')) > len(get_kind(s, 'villagers'))
+    # add logic for failed if wolves == 0...?
+    return len(get_kind(s, 'werewolf')) > len(get_kind(s, 'villager'))
 
 def goal_message(s):
     return 'The werewolves are victorious!'
