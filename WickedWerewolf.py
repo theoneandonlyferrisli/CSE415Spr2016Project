@@ -13,7 +13,7 @@ ALL_COMMENTS = {} # "name --> comment"
 # To be replenished
 POSITIVE_ADJ = ["nice", "reliable", "trustworthy", "not"]
 NEGATIVE_ADJ = ["dishonest", "mean", "reckless"]
-NEGATATIVE_VERBS = ["lying", "bluffing", "not-telling-the-truth"]
+NEGATIVE_VERBS = ["lying", "bluffing", "not-telling-the-truth"]
 POSITIVE_VERBS = ["telling-the-truth", "speaking-from-his/her-heart"]
 
 GENERIC_VERBS = ['go', 'be', 'try', 'eat', 'take', 'help',
@@ -75,7 +75,7 @@ class Player:
                 return True
         return False
 
-    def remember_conversations(self):
+    def remember_conversations(self): 
         
         for name in ALL_COMMENTS.keys():
             val = ALL_COMMENTS[name]
@@ -106,26 +106,28 @@ class Player:
         int_to_quality = {0 : "niceness", 1 : "likability", 2 : "suspicion"}   # For randomly choose a quality.
         quality = int_to_quality[random.randrange(0, 3)]    # Randomly chooses a quality to get the top 3 players with that quality.
         comment = ""
-        
+
         if specific_or_not == 1:
-            if quality == 0:    # If making comments based on niceness
+            if quality == "niceness":    # If making comments based on niceness
                 pos_or_neg = random.randrange(0, 2)
                 verb = None
                 names = get_top_3(s, "niceness")
-                comment = "I think" + names[random.randrange(0, 3)] + " is " + POSITIVE_VERBS[random.randrange(0, len(POSITIVE_VERBS))] + "!"
-            if quality == 1:
+                comment = "I think " + names[random.randrange(0, len(names))] + " is " + POSITIVE_VERBS[random.randrange(0, len(POSITIVE_VERBS))] + "!"
+            if quality == "likability":
                 names = get_top_3(s, "likability")
-                comment = "I think" + names[random.randrange(0, 3)] + " is " + POSITIVE_VERBS[random.randrange(0, len(POSITIVE_VERBS))] + "!"
-            if quality == 2:
+                comment = "I think " + names[random.randrange(0, len(names))] + " is " + POSITIVE_VERBS[random.randrange(0, len(POSITIVE_VERBS))] + "!"
+            if quality == "suspicion":
                 names = get_top_3(s, "suspicion")
-                comment = "I think" + names[random.randrange(0, 3)] + " is " + NEGATIVE_VERBS[random.randrange(0, len(NEGATIVE_VERBS))] + "!"
-        else:
+                comment = "I think " + names[random.randrange(0, len(names))] + " is " + NEGATIVE_VERBS[random.randrange(0, len(NEGATIVE_VERBS))] + "!"
+        elif specific_or_not == 0:
             comment = "I " + GENERIC_VERBS[random.randrange(0, len(GENERIC_VERBS))] + " " + NOUNS[random.randrange(0, len(NOUNS))] + "."
         ALL_COMMENTS[self.name] = comment
         if comment != '':
             print(comment)
         
     def respond(self):
+        #print(self.COMMENTS_ABOUT_ME)
+        #print(ALL_COMMENTS)
         if len(self.COMMENTS_ABOUT_ME) != 0:
             names = self.COMMENTS_ABOUT_ME.keys()
             name = names[random.randrange(0, len(names))]
@@ -348,7 +350,6 @@ qualities = ['niceness', 'likability']
 changes = [0.0, 0.1, -0.1, 0.5, -0.5]
 for p in itertools.product(werewolves, qualities, changes):
     COMBOS.append(p)
-print(COMBOS)
     
 OPERATORS = [Operator('Werewolf: '+ str(a) +' Quality: '+ str(b) +' Change: ' + str(c),
                       lambda s,a=a,b=b,c=c: can_move(s,a,b,c),
